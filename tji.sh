@@ -1,7 +1,8 @@
 #!/bin/bash
 
-echo "=== Setup môi trường và chạy Minecraft Bot Tester với tùy chọn Proxy và Login ==="
+echo "=== Setup môi trường và chạy Minecraft Bot Tester với tùy chọn Proxy ==="
 
+# Kiểm tra Node.js
 if ! command -v node &> /dev/null
 then
     echo "Node.js chưa được cài đặt. Cài đặt Node.js..."
@@ -25,14 +26,12 @@ const fs = require('fs');
 
 const serverIP = process.argv[2];
 const serverPort = parseInt(process.argv[3]);
-const botCount = Math.min(parseInt(process.argv[4]), 100);
-const useProxy = process.argv[5] === 'yes';
+const botCount = Math.min(parseInt(process.argv[4]), 1000);
+const useProxy = process.argv[5] === 'yes'; // 'yes' dùng proxy, 'no' không dùng
 const proxyFile = process.argv[6] || 'proxies.txt';
-const doLogin = process.argv[7] === 'yes';
-const password = "matkhau123";
 
 let proxies = [];
-if (useProxy) {
+if(useProxy){
   try {
     proxies = fs.readFileSync(proxyFile, 'utf-8')
       .split('\n')
@@ -51,66 +50,48 @@ function getRandomProxy() {
   return { host, port: parseInt(port) };
 }
 
-function randomString(length) {
-  const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
-  let result = '';
-  for (let i = 0; i < length; i++) {
-    result += chars[Math.floor(Math.random() * chars.length)];
-  }
-  return result;
-}
-
 function createBot(id) {
-  const username = 'Bot' + randomString(6);
-
   const options = {
     host: serverIP,
     port: serverPort,
-    username,
+    username: `TestBot${id}`,
   };
 
-  if (useProxy) {
+  if(useProxy){
     const proxy = getRandomProxy();
-    if (proxy) {
+    if(proxy){
       options.agent = new SocksProxyAgent({
         socksHost: proxy.host,
         socksPort: proxy.port,
         socksVersion: 5,
       });
-      console.log(`Bot ${username} dùng proxy ${proxy.host}:${proxy.port}`);
+      console.log(`Bot TestBot${id} dùng proxy ${proxy.host}:${proxy.port}`);
     } else {
-      console.log(`Bot ${username} không tìm thấy proxy, kết nối thẳng.`);
+      console.log(`Bot TestBot${id} không tìm thấy proxy, kết nối thẳng.`);
     }
   } else {
-    console.log(`Bot ${username} kết nối trực tiếp không dùng proxy.`);
+    console.log(`Bot TestBot${id} kết nối trực tiếp không dùng proxy.`);
   }
 
   const bot = mineflayer.createBot(options);
 
   bot.on('login', () => {
-    console.log(`Bot ${username} đã đăng nhập thành công.`);
-  });
-
-  bot.once('spawn', () => {
-    if (doLogin) {
-      bot.chat(`/register ${password} ${password}`);
-      bot.chat(`/login ${password}`);
-    }
+    console.log(`Bot TestBot${id} đã đăng nhập thành công.`);
   });
 
   bot.on('kicked', (reason) => {
-    console.log(`Bot ${username} bị kick: ${reason}`);
+    console.log(`Bot TestBot${id} bị kick: ${reason}`);
   });
 
   bot.on('error', (err) => {
-    console.log(`Bot ${username} lỗi: ${err.message}`);
+    console.log(`Bot TestBot${id} lỗi: ${err.message}`);
   });
 
   bot.on('end', () => {
-    console.log(`Bot ${username} đã ngắt kết nối, sẽ thử kết nối lại sau 30s.`);
+    console.log(`Bot TestBot${id} đã ngắt kết nối, sẽ thử kết nối lại sau 10s.`);
     setTimeout(() => {
       createBot(id);
-    }, 30000);
+    }, 10000);
   });
 
   bot._client.on('keep_alive', () => {});
@@ -121,6 +102,7 @@ for (let i = 1; i <= botCount; i++) {
 }
 EOF
 
+# Tạo file proxies.txt mẫu nếu chưa có
 if [ ! -f proxies.txt ]; then
 cat > proxies.txt << EOP
 # Đặt proxy SOCKS5 mỗi dòng dạng ip:port, ví dụ:
@@ -133,15 +115,12 @@ read -p "Nhập IP server Minecraft: " ip
 read -p "Nhập port server (mặc định 25565): " port
 port=${port:-25565}
 
-read -p "Nhập số bot muốn join (tối đa 100): " botcount
+read -p "Nhập số bot muốn join (tối đa 1000): " botcount
 if [ -z "$botcount" ]; then botcount=10; fi
 if [ "$botcount" -gt 100 ]; then botcount=100; fi
 
 read -p "Bạn có muốn dùng proxy không? (yes/no, mặc định no): " useproxy
 useproxy=${useproxy:-no}
-
-read -p "Bot có cần login/register không? (yes/no, mặc định yes): " dologin
-dologin=${dologin:-yes}
 
 proxyfile="proxies.txt"
 if [ "$useproxy" = "yes" ]; then
@@ -150,4 +129,4 @@ if [ "$useproxy" = "yes" ]; then
 fi
 
 echo "Đang chạy bot..."
-node multiBot.js "$ip" "$port" "$botcount" "$useproxy" "$proxyfile" "$dologin"
+node multiBot.js "$ip" "$port" "$botcount" "$useproxy" "$proxyfile"
