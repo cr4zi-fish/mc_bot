@@ -88,10 +88,10 @@ function createBot(id) {
   });
 
   bot.on('end', () => {
-    console.log(`Bot TestBot${id} đã ngắt kết nối, sẽ thử kết nối lại sau 10s.`);
+    console.log(`Bot TestBot${id} đã ngắt kết nối, sẽ thử kết nối lại sau 0.1s.`);
     setTimeout(() => {
       createBot(id);
-    }, 10000);
+    }, 10);
   });
 
   bot._client.on('keep_alive', () => {});
