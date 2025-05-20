@@ -1,5 +1,7 @@
 #!/bin/bash
 
+clear
+
 echo "=== Setup môi trường và chạy Minecraft Bot Tester với tùy chọn Proxy ==="
 
 # Kiểm tra Node.js
@@ -121,7 +123,7 @@ read -p "Nhập IP server Minecraft: " ip
 read -p "Nhập port server (mặc định 25565): " port
 port=${port:-25565}
 
-read -p "Nhập số bot muốn join (tối đa 1000): " botcount
+read -p "Nhập số bot muốn join (tối đa 100): " botcount
 if [ -z "$botcount" ]; then botcount=10; fi
 if [ "$botcount" -gt 1000 ]; then botcount=1000; fi
 

@@ -1,0 +1,3 @@
+# Đặt proxy SOCKS5 mỗi dòng dạng ip:port, ví dụ:
+# 127.0.0.1:1080
+# 192.168.1.100:1080

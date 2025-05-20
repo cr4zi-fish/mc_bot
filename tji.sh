@@ -1,5 +1,7 @@
 #!/bin/bash
 
+clear
+
 echo "=== Setup môi trường và chạy Minecraft Bot Tester với tùy chọn Proxy ==="
 
 # Kiểm tra Node.js
