@@ -44,4 +44,4 @@ echo "Nhập CPS (số lần tấn công trong 1s):"
 read CPS
 
 # Chạy bot
-java -jar MCBOT.jar $IP_PORT $PROTOCOL $METHOD $SECONDS $CPS
+java -jar /workspaces/mc_bot/tool/MCBOT.jar $IP_PORT $PROTOCOL $METHOD $SECONDS $CPS
